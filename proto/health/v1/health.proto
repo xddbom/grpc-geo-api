@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+package health.v1;
+
+option go_package = "grpc-geo-api/gen/go/health/v1";
+
+// Health service для проверки состояния сервера
+service Health {
+    // Проверка здоровья сервиса
+    rpc Check(HealthRequest) returns (HealthResponse) {}
+}
+
+// Запрос на проверку здоровья
+message HealthRequest {
+    // Имя сервиса для проверки (пустое = общая проверка)
+    string service = 1;
+}
+
+// Ответ о состоянии здоровья
+message HealthResponse {
+    // Статус сервиса
+    string status = 1;
+}
