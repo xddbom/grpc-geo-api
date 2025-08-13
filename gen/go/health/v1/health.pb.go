@@ -7,6 +7,7 @@
 package v1
 
 import (
+	_ "google.golang.org/genproto/googleapis/api/annotations"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
@@ -21,11 +22,9 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-// Запрос на проверку здоровья
 type HealthRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// Имя сервиса для проверки (пустое = общая проверка)
-	Service       string `protobuf:"bytes,1,opt,name=service,proto3" json:"service,omitempty"`
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Service       string                 `protobuf:"bytes,1,opt,name=service,proto3" json:"service,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -67,11 +66,9 @@ func (x *HealthRequest) GetService() string {
 	return ""
 }
 
-// Ответ о состоянии здоровья
 type HealthResponse struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// Статус сервиса
-	Status        string `protobuf:"bytes,1,opt,name=status,proto3" json:"status,omitempty"`
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Status        string                 `protobuf:"bytes,1,opt,name=status,proto3" json:"status,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -117,13 +114,13 @@ var File_health_v1_health_proto protoreflect.FileDescriptor
 
 const file_health_v1_health_proto_rawDesc = "" +
 	"\n" +
-	"\x16health/v1/health.proto\x12\thealth.v1\")\n" +
+	"\x16health/v1/health.proto\x12\thealth.v1\x1a\x1cgoogle/api/annotations.proto\")\n" +
 	"\rHealthRequest\x12\x18\n" +
 	"\aservice\x18\x01 \x01(\tR\aservice\"(\n" +
 	"\x0eHealthResponse\x12\x16\n" +
-	"\x06status\x18\x01 \x01(\tR\x06status2H\n" +
-	"\x06Health\x12>\n" +
-	"\x05Check\x12\x18.health.v1.HealthRequest\x1a\x19.health.v1.HealthResponse\"\x00B\x1fZ\x1dgrpc-geo-api/gen/go/health/v1b\x06proto3"
+	"\x06status\x18\x01 \x01(\tR\x06status2z\n" +
+	"\x06Health\x12p\n" +
+	"\x05Check\x12\x18.health.v1.HealthRequest\x1a\x19.health.v1.HealthResponse\"2\x82\xd3\xe4\x93\x02,Z\x10\x12\x0e/api/v1/health\x12\x18/api/v1/health/{service}B\x1fZ\x1dgrpc-geo-api/gen/go/health/v1b\x06proto3"
 
 var (
 	file_health_v1_health_proto_rawDescOnce sync.Once
