@@ -9,6 +9,7 @@ import (
 type Config struct {
 	GRPC		GRPCConfig
 	Gateway		GatewayConfig
+	Log			LogConfig
 }
 
 type GRPCConfig struct {
@@ -21,6 +22,11 @@ type GatewayConfig struct {
 	Host	string
 }
 
+type LogConfig struct {
+	Level		string
+	Environment	string
+}
+
 func Load() *Config {
 	return &Config{
 		GRPC: GRPCConfig{
@@ -31,6 +37,10 @@ func Load() *Config {
 		Gateway: GatewayConfig{
 			Port: getEnv("GATEWAY_PORT", "8081"),
 			Host: getEnv("GATEWAY_HOST", ""),
+		},
+		Log: LogConfig{
+			Level:       getEnv("LOG_LEVEL", "debug"),
+			Environment: getEnv("APP_ENV", "development"),
 		},
 	}
 }

@@ -2,23 +2,29 @@ package main
 
 import (
     "log"
-    
+
+    "go.uber.org/zap"
     "grpc-geo-api/internal/app"
     "grpc-geo-api/internal/config"
 )
 
 func main() {
     cfg := config.Load()
-    
-    application, err := app.New(*cfg)
+
+    logger, err := app.NewLogger(&cfg.Log)
     if err != nil {
-        log.Fatalf("Failed to initialize application: %v", err)
+        log.Fatalf("Failed to initialize logger: %v", err)
     }
-    
- 
+    defer logger.Sync()
+
+    application, err := app.New(*cfg, logger)
+    if err != nil {
+        logger.Fatal("Failed to initialize application", zap.Error(err))
+    }
+
     if err := application.Run(); err != nil {
-        log.Fatalf("Application runtime error: %v", err)
+        logger.Fatal("Application runtime error", zap.Error(err))
     }
-    
-    log.Println("Application exited successfully")
+
+    logger.Info("Application exited successfully")
 }

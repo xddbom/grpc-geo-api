@@ -2,12 +2,12 @@ package app
 
 import (
     "fmt"
-    "log"
     "os"
     "os/signal"
-    "syscall"
     "sync"
+    "syscall"
 
+    "go.uber.org/zap"
     "grpc-geo-api/internal/config"
 )
 
@@ -15,17 +15,17 @@ type App struct {
     grpcServer *Server
     gateway    *Gateway
     config     config.Config
+    logger     *zap.Logger
 }
 
-func New(cfg config.Config) (*App, error) {
-    grpcServer, err := NewServer(cfg.GRPC)
+func New(cfg config.Config, logger *zap.Logger) (*App, error) {
+    grpcServer, err := NewServer(cfg.GRPC, logger) 
     if err != nil {
         return nil, fmt.Errorf("failed to create gRPC server: %w", err)
     }
-
     grpcServer.RegisterServices()
 
-    gateway, err := NewGateway(cfg)
+    gateway, err := NewGateway(cfg, logger)
     if err != nil {
         return nil, fmt.Errorf("failed to create gateway: %w", err)
     }
@@ -34,27 +34,29 @@ func New(cfg config.Config) (*App, error) {
         grpcServer: grpcServer,
         gateway:    gateway,
         config:     cfg,
+        logger:     logger,
     }, nil
 }
 
 func (a *App) Run() error {
     errChan := make(chan error, 2)
-    
     var wg sync.WaitGroup
     wg.Add(2)
 
     go func() {
         defer wg.Done()
-        log.Printf("Starting gRPC server on %s", a.config.GRPC.Address())
+        a.logger.Info("Starting gRPC server", zap.String("address", a.config.GRPC.Address()))
         if err := a.grpcServer.Start(); err != nil {
+            a.logger.Error("gRPC server failed", zap.Error(err))
             errChan <- fmt.Errorf("gRPC server error: %w", err)
         }
     }()
 
     go func() {
         defer wg.Done()
-        log.Printf("Starting HTTP gateway on %s", a.config.Gateway.Address())
+        a.logger.Info("Starting HTTP gateway", zap.String("address", a.config.Gateway.Address()))
         if err := a.gateway.Start(); err != nil {
+            a.logger.Error("Gateway failed", zap.Error(err))
             errChan <- fmt.Errorf("gateway error: %w", err)
         }
     }()
@@ -68,25 +70,25 @@ func (a *App) waitForShutdown(errChan chan error, wg *sync.WaitGroup) error {
 
     select {
     case err := <-errChan:
-        log.Printf("Server error occurred: %v", err)
+        a.logger.Error("Server error occurred", zap.Error(err))
         a.Stop()
         return err
     case sig := <-sigChan:
-        log.Printf("Received signal: %v", sig)
+        a.logger.Info("Received shutdown signal", zap.String("signal", sig.String()))
         a.Stop()
-        wg.Wait() 
+        wg.Wait()
         return nil
     }
 }
 
 func (a *App) Stop() {
-    log.Println("Shutting down application...")
+    a.logger.Info("Initiating graceful shutdown")
 
-    log.Println("Stopping gateway...")
+    a.logger.Debug("Stopping gateway")
     a.gateway.Stop()
 
-    log.Println("Stopping gRPC server...")
+    a.logger.Debug("Stopping gRPC server")
     a.grpcServer.Stop()
 
-    log.Println("Application stopped gracefully")
+    a.logger.Info("Application stopped gracefully")
 }
