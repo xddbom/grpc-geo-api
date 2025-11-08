@@ -1,0 +1,17 @@
+bin/
+*.exe
+edge-gateway
+
+.vscode/
+.idea/
+*.swp
+
+.env
+.env.local
+
+tmp/
+*.log
+
+vendor/
+
+.DS_Store

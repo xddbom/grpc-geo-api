@@ -29,3 +29,5 @@ if [ -n "$UNFORMATTED" ]; then
   exit 1
 fi
 echo "✅ Code formatted with gofumpt."
+
+# TODO: Fix (or add?) import formating util, some problems with gofumpt
