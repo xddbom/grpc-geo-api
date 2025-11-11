@@ -1,0 +1,57 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "aggregate/v1/aggregate.proto",
+    "version": "version not set"
+  },
+  "tags": [
+    {
+      "name": "Aggregator"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/api/v1/aggregate": {
+      "get": {
+        "operationId": "Aggregator_Aggregate",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1AggregateResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "ip",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "Aggregator"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "v1AggregateResponse": {
+      "type": "object",
+      "properties": {
+        "geo": {
+          "type": "string"
+        },
+        "weather": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

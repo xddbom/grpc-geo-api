@@ -1,0 +1,31 @@
+FROM golang:1.25-alpine AS builder
+
+RUN apk add --no-cache git ca-certificates curl
+
+WORKDIR /app
+
+COPY go.mod go.sum ./
+RUN go mod download && go mod verify
+
+COPY . .
+
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build \
+    -ldflags="-w -s" \
+    -trimpath \
+    -o /edge-gateway ./services/edge-gateway/cmd
+
+RUN curl -L -o /bin/grpc_health_probe \
+     https://github.com/grpc-ecosystem/grpc-health-probe/releases/download/v0.4.41/grpc_health_probe-linux-amd64 && \
+     chmod +x /bin/grpc_health_probe
+
+FROM gcr.io/distroless/static-debian12:nonroot
+
+WORKDIR /
+
+COPY --from=builder /edge-gateway /edge-gateway
+
+COPY --from=builder /bin/grpc_health_probe /bin/grpc_health_probe
+
+EXPOSE 50051
+
+ENTRYPOINT ["/edge-gateway"]
