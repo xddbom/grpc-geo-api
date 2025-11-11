@@ -1,6 +1,5 @@
 bin/
 *.exe
-edge-gateway
 
 .vscode/
 .idea/
