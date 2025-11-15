@@ -8,10 +8,7 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/health"
 	"google.golang.org/grpc/reflection"
-
-	"github.com/xddbom/grpc-geo-api/services/edge-gateway/handlers" 
-
-	aggregatorv1 "github.com/xddbom/grpc-geo-api/api/gen/go/aggregate/v1"    
+  
 	healthpb "google.golang.org/grpc/health/grpc_health_v1"
 )
 
@@ -46,11 +43,6 @@ func (s *Server) RegisterServices() {
     s.healthSrv.SetServingStatus("grpc.health.v1.Health", healthpb.HealthCheckResponse_SERVING)		// ?
 	s.healthSrv.SetServingStatus("", healthpb.HealthCheckResponse_SERVING)							// ?
 	healthpb.RegisterHealthServer(s.grpcServer, s.healthSrv)										// ?
-
-	aggregatorHandler := handlers.NewAggregatorHandler()
-	aggregatorv1.RegisterAggregatorServer(s.grpcServer, aggregatorHandler)
-	s.healthSrv.SetServingStatus("aggregate.v1.Aggregator", healthpb.HealthCheckResponse_SERVING) 
-
 
 	reflection.Register(s.grpcServer)
 	s.logger.Info("gRPC services registered")

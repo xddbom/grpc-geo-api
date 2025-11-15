@@ -11,26 +11,19 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 
 	"github.com/xddbom/grpc-geo-api/services/edge-gateway/internal/config"
-
-	aggregatorv1 "github.com/xddbom/grpc-geo-api/api/gen/go/aggregate/v1"
 )
 
 type Gateway struct {
 	server  *http.Server
 	address string
 	logger  *zap.Logger
+	opts    []grpc.DialOption
 }
 
 func NewGateway(cfg config.Config, logger *zap.Logger) (*Gateway, error) {
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
 
 	mux := runtime.NewServeMux()
-	opts := []grpc.DialOption{grpc.WithTransportCredentials(insecure.NewCredentials())}
-
-	if err := aggregatorv1.RegisterAggregatorHandlerFromEndpoint(ctx, mux, cfg.GRPC.Address(), opts); err != nil {
-		return nil, err
-	}
+    opts := []grpc.DialOption{grpc.WithTransportCredentials(insecure.NewCredentials())}
 
 	server := &http.Server{
 		Addr:    cfg.Gateway.Address(),
@@ -43,6 +36,7 @@ func NewGateway(cfg config.Config, logger *zap.Logger) (*Gateway, error) {
 		server:  server,
 		address: cfg.Gateway.Address(),
 		logger:  gatewayLogger,
+		opts: 	 opts,
 	}, nil
 }
 
