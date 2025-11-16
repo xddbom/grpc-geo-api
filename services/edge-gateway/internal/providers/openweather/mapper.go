@@ -4,7 +4,7 @@ import (
 	"github.com/xddbom/grpc-geo-api/services/edge-gateway/internal/domain/weather"
 )
 
-func (p *OpenWeatherProvider)mapToDomain(ow *OneCallResponse, coords weather.Coordinates) (*weather.Weather) {
+func mapToDomain(ow *OneCallResponse, coords weather.Coordinates) (*weather.Weather) {
     var condition string
     if len(ow.Current.Weather) > 0 {
         condition = ow.Current.Weather[0].Description

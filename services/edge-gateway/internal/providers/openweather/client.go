@@ -140,5 +140,5 @@ func (p *OpenWeatherProvider) FetchWeatherByCoordinates(ctx context.Context, coo
 		return nil, err
 	}
 
-	return p.mapToDomain(&ow, coords), nil
+	return mapToDomain(&ow, coords), nil
 }
