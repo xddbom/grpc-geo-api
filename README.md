@@ -54,3 +54,5 @@ make proto
 make compose-up    
 make compose-down  
 make run     
+make docs
+```
