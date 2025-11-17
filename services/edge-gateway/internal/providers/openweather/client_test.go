@@ -24,7 +24,13 @@ func TestOpenWeatherProvider_HappyPath(t *testing.T) {
 		})
 	})
 
-	mux.HandleFunc("/data/3.0/onecall", func(w http.ResponseWriter, r *http.Request) {
+mux.HandleFunc("/data/3.0/onecall", func(w http.ResponseWriter, r *http.Request) {
+
+	assert.Equal(t, "50.450000", r.URL.Query().Get("lat"))
+	assert.Equal(t, "30.523000", r.URL.Query().Get("lon"))
+    assert.Equal(t, "test-key", r.URL.Query().Get("appid"))
+	assert.Equal(t, "metric", r.URL.Query().Get("units"))
+
 		json.NewEncoder(w).Encode(map[string]any{
 			"current": map[string]any{
 				"temp":        22.0,
@@ -40,10 +46,13 @@ func TestOpenWeatherProvider_HappyPath(t *testing.T) {
 	server := httptest.NewServer(mux)
 	defer server.Close()
 
-	openweather.GeoBaseURL = server.URL + "/geo/1.0/direct"
-	openweather.OwmBaseURL = server.URL + "/data/3.0/onecall"
-
-	p := openweather.New("test-key", server.Client(), zap.NewNop())
+	p := openweather.New(
+    	"test-key",
+    	server.URL+"/geo/1.0/direct",
+    	server.URL+"/data/3.0/onecall",
+    	server.Client(),
+    	zap.NewNop(),
+	)
 
 	res, err := p.FetchWeatherByCity(context.Background(), "Kyiv")
 	assert.NoError(t, err)
@@ -67,10 +76,13 @@ func TestOpenWeatherProvider_GeoEmptyResult(t *testing.T) {
 	server := httptest.NewServer(mux)
 	defer server.Close()
 
-	openweather.GeoBaseURL = server.URL + "/geo/1.0/direct"
-	openweather.OwmBaseURL = server.URL 
-
-	p := openweather.New("key", server.Client(), zap.NewNop())
+	p := openweather.New(
+    	"test-key",
+    	server.URL+"/geo/1.0/direct",
+    	server.URL+"/data/3.0/onecall",
+    	server.Client(),
+    	zap.NewNop(),
+	)
 
 	res, err := p.FetchWeatherByCity(context.Background(), "UnknownCity")
 
@@ -92,11 +104,14 @@ func TestOpenWeatherProvider_OneCallInvalidJSON(t *testing.T) {
 
 	server := httptest.NewServer(mux)
 	defer server.Close()
-
-	openweather.GeoBaseURL = server.URL + "/geo/1.0/direct"
-	openweather.OwmBaseURL = server.URL + "/data/3.0/onecall"
-
-	p := openweather.New("key", server.Client(), zap.NewNop())
+	
+	p := openweather.New(
+    	"test-key",
+    	server.URL+"/geo/1.0/direct",
+    	server.URL+"/data/3.0/onecall",
+    	server.Client(),
+    	zap.NewNop(),
+	)
 
 	res, err := p.FetchWeatherByCity(context.Background(), "Kyiv")
 
@@ -108,18 +123,25 @@ func TestOpenWeatherProvider_OneCallInvalidJSON(t *testing.T) {
 func TestOpenWeatherProvider_GeoAPI500(t *testing.T) {
     mux := http.NewServeMux()
 
-    mux.HandleFunc("/geo/1.0/direct", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/geo/1.0/direct", func(w http.ResponseWriter, r *http.Request) {
         w.WriteHeader(500)
         w.Write([]byte(`internal error`))
+    })
+
+    mux.HandleFunc("/data/3.0/onecall", func(w http.ResponseWriter, r *http.Request) {
+        t.Fatalf("OneCall endpoint should NOT be called in this test")
     })
 
     server := httptest.NewServer(mux)
     defer server.Close()
 
-    openweather.GeoBaseURL = server.URL + "/geo/1.0/direct"
-    openweather.OwmBaseURL = server.URL
-
-    p := openweather.New("key", server.Client(), zap.NewNop())
+	p := openweather.New(
+    	"test-key",
+    	server.URL+"/geo/1.0/direct",
+    	server.URL+"/data/3.0/onecall",
+    	server.Client(),
+    	zap.NewNop(),
+	)
 
     res, err := p.FetchWeatherByCity(context.Background(), "Kyiv")
 

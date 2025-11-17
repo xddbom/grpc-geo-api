@@ -16,16 +16,20 @@ import (
 
 type OpenWeatherProvider struct {
 	apiKey     string
+	geoURL	   string
+	oneCallURL string
 	httpClient *http.Client
 	logger     *zap.Logger
 }
 
-var GeoBaseURL = "https://api.openweathermap.org/geo/1.0/direct"
-var OwmBaseURL = "https://api.openweathermap.org/data/3.0/onecall"
+// var GeoBaseURL = "https://api.openweathermap.org/geo/1.0/direct"
+// var OwmBaseURL = "https://api.openweathermap.org/data/3.0/onecall"
 
-func New(key string, c *http.Client, logger *zap.Logger) *OpenWeatherProvider {
+func New(key, geoURL, oneCallURL string, c *http.Client, logger *zap.Logger) *OpenWeatherProvider {
 	return &OpenWeatherProvider{
 		apiKey:     key,
+		geoURL:     geoURL,
+        oneCallURL: oneCallURL,
 		httpClient: c,
 		logger:     logger,
 	}
@@ -34,7 +38,7 @@ func New(key string, c *http.Client, logger *zap.Logger) *OpenWeatherProvider {
 func (p *OpenWeatherProvider) FetchWeatherByCity(ctx context.Context, city string) (*weather.Weather, error) {
 	p.logger.Debug("OpenWeather: fetch by city", zap.String("city", city))
 
-	base, err := url.Parse(GeoBaseURL)
+	base, err := url.Parse(p.geoURL)
 	if err != nil {
 		return nil, fmt.Errorf("invalid GeoAPI base URL: %w", err)
 	}
@@ -93,7 +97,7 @@ func (p *OpenWeatherProvider) FetchWeatherByCoordinates(ctx context.Context, coo
 		zap.Float64("lon", coords.Longitude),
 	)
 
-	base, err := url.Parse(OwmBaseURL)
+	base, err := url.Parse(p.oneCallURL)
 	if err != nil {
 		return nil, fmt.Errorf("invalid OWM base URL: %w", err)
 	}
