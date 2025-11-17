@@ -1,0 +1,15 @@
+site_name: grpc-geo-api Documentation
+
+theme:
+  name: material
+
+nav:
+  - Overview: docs/index.md
+  - Architecture:
+      - C1 (Context): docs/architecture/c1.md
+      - C2 (Container): docs/architecture/c2.md
+  - ADR: docs/adr/
+  - API:
+      - docs/api/index.md
+  - Domain:
+      - docs/domain/index.md
