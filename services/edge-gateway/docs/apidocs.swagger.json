@@ -1,12 +1,12 @@
 {
   "swagger": "2.0",
   "info": {
-    "title": "aggregate/v1/aggregate.proto",
+    "title": "weather_service/v1/weather_service.proto",
     "version": "version not set"
   },
   "tags": [
     {
-      "name": "Aggregator"
+      "name": "WeatherService"
     }
   ],
   "consumes": [
@@ -15,40 +15,46 @@
   "produces": [
     "application/json"
   ],
-  "paths": {
-    "/api/v1/aggregate": {
-      "get": {
-        "operationId": "Aggregator_Aggregate",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/v1AggregateResponse"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "ip",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          }
-        ],
-        "tags": [
-          "Aggregator"
-        ]
-      }
-    }
-  },
+  "paths": {},
   "definitions": {
-    "v1AggregateResponse": {
+    "v1GetWeatherResponse": {
       "type": "object",
       "properties": {
-        "geo": {
+        "actual": {
+          "type": "number",
+          "format": "double"
+        },
+        "feelsLike": {
+          "type": "number",
+          "format": "double"
+        },
+        "windSpeed": {
+          "type": "number",
+          "format": "double"
+        },
+        "windDeg": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "humidity": {
+          "type": "number",
+          "format": "double"
+        },
+        "condition": {
           "type": "string"
         },
-        "weather": {
+        "lat": {
+          "type": "number",
+          "format": "double"
+        },
+        "lon": {
+          "type": "number",
+          "format": "double"
+        },
+        "city": {
+          "type": "string"
+        },
+        "country": {
           "type": "string"
         }
       }

@@ -1,0 +1,34 @@
+syntax = "proto3";
+
+package geo.weather.v1;
+
+service WeatherService {
+    rpc GetWeatherByCoordinates(GetWeatherByCoordinatesRequest)
+        returns (GetWeatherResponse);
+
+    rpc GetWeatherByCity(GetWeatherByCityRequest)
+        returns (GetWeatherResponse);
+}
+
+message GetWeatherByCoordinatesRequest {
+    double lat = 1;
+    double lon = 2;
+}
+
+message GetWeatherByCityRequest {
+    string city = 1;
+}
+
+message GetWeatherResponse {
+    double actual = 1;
+    double feels_like = 2;
+    double wind_speed = 3;
+    int32 wind_deg = 4;
+    double humidity = 5;
+    string condition = 6;
+
+    double lat = 7;
+    double lon = 8;
+    string city = 9;
+    string country = 10;
+}
